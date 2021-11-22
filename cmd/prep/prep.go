@@ -96,7 +96,7 @@ func getPathToPackage(importPath string) (string, error) {
 		return "", fmt.Errorf("failed to detect absolute path of the package %q: %v", importPath, err)
 	}
 
-	return filepath.Join(p.SrcRoot, p.ImportPath), nil
+	return filepath.Clean(p.Dir), nil
 }
 
 func generateCode(packageName, importPath string, queries []string) []byte {
