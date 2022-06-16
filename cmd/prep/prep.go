@@ -21,8 +21,9 @@ import (
 
 type (
 	queryFinder struct {
-		packageInfo map[string]string
-		queries     []string
+		packageInfo    map[string]string
+		queries        []string
+		nonUniqueNames map[string]struct{}
 	}
 )
 
@@ -54,13 +55,15 @@ func main() {
 	}
 
 	finder := &queryFinder{
-		packageInfo: map[string]string{},
+		packageInfo:    map[string]string{},
+		nonUniqueNames: map[string]struct{}{},
 	}
 
 	for k, v := range sourcePackage.TypesInfo.Defs {
 		if constant, ok := v.(*types.Const); ok {
 			if _, ok = finder.packageInfo[k.Name]; ok {
-				log.Fatalf("constant already defined, need unique name for %v", k.Name)
+				finder.nonUniqueNames[k.Name] = struct{}{}
+				continue
 			}
 			finder.packageInfo[k.Name] = constant.Val().ExactString()
 		}
@@ -186,6 +189,9 @@ func (f *queryFinder) processQuery(queryArg ast.Expr) string {
 	case *ast.BasicLit:
 		return q.Value
 	case *ast.Ident:
+		if _, ok := f.nonUniqueNames[q.Name]; ok {
+			log.Fatalf("constant already defined, need unique name for %v", q.Name)
+		}
 		return f.packageInfo[q.Name]
 	}
 	return ""
