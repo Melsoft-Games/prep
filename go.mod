@@ -1,10 +1,7 @@
 module github.com/Melsoft-Games/prep
 
-go 1.19
+go 1.21
 
-require golang.org/x/tools v0.2.0
+require golang.org/x/tools v0.17.0
 
-require (
-	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
-)
+require golang.org/x/mod v0.14.0 // indirect
